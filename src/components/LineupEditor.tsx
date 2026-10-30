@@ -159,15 +159,15 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs dark:shadow-lg transition-colors">
       {/* Header & Mode Switcher */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Sliders className="w-5 h-5 text-blue-400" />
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Sliders className="w-5 h-5 text-blue-500 dark:text-blue-400" />
             主角隊 1～9 棒打線配置實驗室 (Lineup & Point Pool)
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             其餘 29 支對照組球隊全能力恆定為 50，確保勝率與進階數據變化 100% 來自受測打線
           </p>
         </div>
@@ -179,8 +179,8 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
             onClick={() => onChangeMode('free')}
             className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
               mode === 'free'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             <Sparkles className="w-4 h-4" />
@@ -192,8 +192,8 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
             onClick={() => onChangeMode('budget')}
             className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
               mode === 'budget'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             <Flame className="w-4 h-4" />
@@ -205,13 +205,13 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
       {/* Presets & Budget Meter Bar */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 my-4">
         {/* Quick Experiment Presets */}
-        <div className="xl:col-span-7 bg-slate-950/70 border border-slate-800/80 rounded-lg p-3">
-          <div className="text-xs font-semibold text-slate-300 mb-2 flex items-center justify-between">
+        <div className="xl:col-span-7 bg-slate-50/90 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 rounded-lg p-3">
+          <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center justify-between">
             <span>一鍵套用經典實驗預設集 (Experiment Presets)</span>
             <button
               type="button"
               onClick={() => applyPreset('baseline50')}
-              className="text-xs text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               重置全 50 基準
@@ -221,42 +221,42 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
             <button
               type="button"
               onClick={() => applyPreset('baseline50')}
-              className="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 cursor-pointer"
+              className="px-2.5 py-1.5 rounded bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 cursor-pointer shadow-2xs"
             >
               基準全 50 對照組
             </button>
             <button
               type="button"
               onClick={() => applyPreset('1stPower100')}
-              className="px-2.5 py-1.5 rounded bg-rose-950/70 hover:bg-rose-900/80 text-xs text-rose-200 border border-rose-800/60 cursor-pointer"
+              className="px-2.5 py-1.5 rounded bg-rose-50 dark:bg-rose-950/70 hover:bg-rose-100 dark:hover:bg-rose-900/80 text-xs text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800/60 cursor-pointer shadow-2xs"
             >
               一棒長打 100 (其餘 50)
             </button>
             <button
               type="button"
               onClick={() => applyPreset('4thPower100')}
-              className="px-2.5 py-1.5 rounded bg-amber-950/70 hover:bg-amber-900/80 text-xs text-amber-200 border border-amber-800/60 cursor-pointer"
+              className="px-2.5 py-1.5 rounded bg-amber-50 dark:bg-amber-950/70 hover:bg-amber-100 dark:hover:bg-amber-900/80 text-xs text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800/60 cursor-pointer shadow-2xs"
             >
               四棒長打 100 (其餘 50)
             </button>
             <button
               type="button"
               onClick={() => applyPreset('1stTableSetter')}
-              className="px-2.5 py-1.5 rounded bg-sky-950/70 hover:bg-sky-900/80 text-xs text-sky-200 border border-sky-800/60 cursor-pointer"
+              className="px-2.5 py-1.5 rounded bg-sky-50 dark:bg-sky-950/70 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-xs text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800/60 cursor-pointer shadow-2xs"
             >
               一棒選球 100 + 速度 100
             </button>
             <button
               type="button"
               onClick={() => applyPreset('budgetModernOptimized')}
-              className="px-2.5 py-1.5 rounded bg-emerald-950/70 hover:bg-emerald-900/80 text-xs text-emerald-200 border border-emerald-800/60 cursor-pointer"
+              className="px-2.5 py-1.5 rounded bg-emerald-50 dark:bg-emerald-950/70 hover:bg-emerald-100 dark:hover:bg-emerald-900/80 text-xs text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800/60 cursor-pointer shadow-2xs"
             >
               [1800點] 單人鎖定 200 點特化型
             </button>
             <button
               type="button"
               onClick={() => applyPreset('budgetStarsAndScrubs')}
-              className="px-2.5 py-1.5 rounded bg-purple-950/70 hover:bg-purple-900/80 text-xs text-purple-200 border border-purple-800/60 cursor-pointer"
+              className="px-2.5 py-1.5 rounded bg-purple-50 dark:bg-purple-950/70 hover:bg-purple-100 dark:hover:bg-purple-900/80 text-xs text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-800/60 cursor-pointer shadow-2xs"
             >
               [1800點] 三巨星集中打線
             </button>
@@ -265,16 +265,16 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
 
         {/* Point Pool Status Box */}
         <div
-          className={`xl:col-span-5 rounded-lg p-3 border ${
+          className={`xl:col-span-5 rounded-lg p-3 border transition-colors ${
             mode === 'budget' && !budgetInfo.isValid
-              ? 'bg-rose-950/40 border-rose-700'
-              : 'bg-slate-950/70 border-slate-800/80'
+              ? 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700'
+              : 'bg-slate-50/90 dark:bg-slate-950/70 border-slate-200 dark:border-slate-800/80'
           }`}
         >
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
               團隊總預算消耗
-              <span className="text-[11px] text-slate-400 font-normal">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">
                 (81~100 每級消耗 2 點)
               </span>
             </span>
@@ -285,8 +285,8 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                 onClick={() => onChangeLock200(!lockSinglePlayer200)}
                 className={`px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 border cursor-pointer ${
                   lockSinglePlayer200
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
-                    : 'bg-slate-800 text-slate-400 border-slate-700'
+                    ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-500/50'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 border-slate-300 dark:border-slate-700'
                 }`}
               >
                 {lockSinglePlayer200 ? (
@@ -303,21 +303,21 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
           </div>
 
           <div className="flex items-baseline justify-between">
-            <div className="text-lg font-mono font-bold text-white">
+            <div className="text-lg font-mono font-bold text-slate-900 dark:text-white">
               {budgetInfo.totalCost.toLocaleString()}{' '}
-              <span className="text-xs text-slate-400 font-normal">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">
                 / {TEAM_BUDGET_LIMIT.toLocaleString()} 點
               </span>
             </div>
 
             {mode === 'budget' ? (
               budgetInfo.isValid ? (
-                <span className="text-xs text-emerald-400 flex items-center gap-1 font-medium">
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   剩餘 {budgetInfo.remainingPoints} 點 (符合規範)
                 </span>
               ) : (
-                <span className="text-xs text-rose-400 flex items-center gap-1 font-semibold">
+                <span className="text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1 font-semibold">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   {budgetInfo.overBudgetPoints > 0
                     ? `總預算超支 ${budgetInfo.overBudgetPoints} 點`
@@ -325,14 +325,14 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                 </span>
               )
             ) : (
-              <span className="text-xs text-blue-400 font-medium">
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                 自由實驗模式 (不限點數上限)
               </span>
             )}
           </div>
 
           {/* Progress Bar */}
-          <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2">
+          <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
             <div
               className={`h-full transition-all duration-200 ${
                 mode === 'budget' && !budgetInfo.isValid
@@ -353,7 +353,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400">
+            <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
               <th className="py-2 px-2 w-16">棒次</th>
               <th className="py-2 px-2 w-40">打者名稱</th>
               {ATTRIBUTE_KEYS.map((attr) => (
@@ -365,7 +365,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
               <th className="py-2 px-2 text-right w-52">理論期望三圍 (AVG/OBP/SLG/OPS)</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 text-xs">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 text-xs">
             {lineup.map((batter, idx) => {
               const pCost = calculatePlayerCost(batter.attributes);
               const slash = estimateTheoreticalSlashLine(batter.attributes);
@@ -377,14 +377,14 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
               return (
                 <tr
                   key={batter.id}
-                  className={`hover:bg-slate-800/40 transition ${
-                    isSlotViolating ? 'bg-rose-950/25' : ''
+                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/40 transition ${
+                    isSlotViolating ? 'bg-rose-50 dark:bg-rose-950/25' : ''
                   }`}
                 >
                   {/* Slot & Move Up/Down */}
-                  <td className="py-2.5 px-2 font-mono font-bold text-slate-200">
+                  <td className="py-2.5 px-2 font-mono font-bold text-slate-800 dark:text-slate-200">
                     <div className="flex items-center gap-1">
-                      <span className="w-5 h-5 rounded bg-slate-800 inline-flex items-center justify-center text-xs text-blue-400">
+                      <span className="w-5 h-5 rounded bg-slate-100 dark:bg-slate-800 inline-flex items-center justify-center text-xs text-blue-600 dark:text-blue-400 font-bold">
                         {batter.slot}
                       </span>
                       <div className="flex flex-col">
@@ -393,7 +393,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                           disabled={idx === 0}
                           onClick={() => handleSwapSlots(idx, idx - 1)}
                           title="上移棒次"
-                          className="text-slate-500 hover:text-slate-200 disabled:opacity-25 cursor-pointer"
+                          className="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 disabled:opacity-25 cursor-pointer"
                         >
                           <ArrowUp className="w-3 h-3" />
                         </button>
@@ -402,7 +402,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                           disabled={idx === lineup.length - 1}
                           onClick={() => handleSwapSlots(idx, idx + 1)}
                           title="下移棒次"
-                          className="text-slate-500 hover:text-slate-200 disabled:opacity-25 cursor-pointer"
+                          className="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 disabled:opacity-25 cursor-pointer"
                         >
                           <ArrowDown className="w-3 h-3" />
                         </button>
@@ -416,7 +416,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                       type="text"
                       value={batter.name}
                       onChange={(e) => handleNameChange(idx, e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-100 focus:outline-none focus:border-blue-500"
+                      className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded px-2 py-1 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500"
                     />
                   </td>
 
@@ -436,7 +436,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                             onChange={(e) =>
                               handleAttrChange(idx, attr.key, Number(e.target.value))
                             }
-                            className={`w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer ${attr.color}`}
+                            className={`w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg cursor-pointer ${attr.color}`}
                           />
                           <input
                             type="number"
@@ -446,15 +446,15 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                             onChange={(e) =>
                               handleAttrChange(idx, attr.key, Number(e.target.value))
                             }
-                            className={`w-12 bg-slate-950 border rounded px-1.5 py-0.5 text-right font-mono text-xs ${
+                            className={`w-12 bg-white dark:bg-slate-950 border rounded px-1.5 py-0.5 text-right font-mono text-xs ${
                               isProgressive
-                                ? 'border-amber-500/70 text-amber-300 font-bold'
-                                : 'border-slate-800 text-slate-200'
+                                ? 'border-amber-500/70 text-amber-600 dark:text-amber-300 font-bold'
+                                : 'border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-200'
                             }`}
                           />
                         </div>
                         {isProgressive && (
-                          <div className="text-[10px] text-amber-400/90 font-mono mt-0.5 text-right">
+                          <div className="text-[10px] text-amber-600 dark:text-amber-400/90 font-mono mt-0.5 text-right">
                             消耗 {attrCost} 點 (2x/級)
                           </div>
                         )}
@@ -467,12 +467,12 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                     <span
                       className={`px-2 py-0.5 rounded font-semibold ${
                         isSlotViolating
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                          ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-500/40'
                           : pCost > 200
-                          ? 'bg-amber-500/15 text-amber-300'
+                          ? 'bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300'
                           : pCost === 200
-                          ? 'bg-slate-800 text-slate-300'
-                          : 'bg-slate-800/60 text-slate-400'
+                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300'
+                          : 'bg-slate-100/70 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400'
                       }`}
                     >
                       {pCost} 點
@@ -481,15 +481,15 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
 
                   {/* Theoretical Slash Line Preview */}
                   <td className="py-2.5 px-2 text-right font-mono">
-                    <div className="text-slate-200">
+                    <div className="text-slate-800 dark:text-slate-200 font-medium">
                       {slash.avg.toFixed(3).replace(/^0/, '')} /{' '}
                       {slash.obp.toFixed(3).replace(/^0/, '')} /{' '}
                       {slash.slg.toFixed(3).replace(/^0/, '')}{' '}
-                      <span className="text-blue-400 font-bold ml-1">
+                      <span className="text-blue-600 dark:text-blue-400 font-bold ml-1">
                         ({slash.ops.toFixed(3).replace(/^0/, '')})
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-400">
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">
                       期望 ~{slash.expectedHRPer650PA.toFixed(0)} HR · BB{' '}
                       {(slash.bbPct * 100).toFixed(1)}% · K {(slash.kPct * 100).toFixed(1)}%
                     </div>

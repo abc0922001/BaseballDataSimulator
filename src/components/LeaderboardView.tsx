@@ -125,24 +125,24 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs dark:shadow-lg transition-colors">
       {/* Header & Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <ListOrdered className="w-5 h-5 text-blue-400" />
+          <ListOrdered className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           <div>
-            <h2 className="text-base font-bold text-white">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">
               打者基礎與進階數據排行榜 (Sabermetrics Leaderboard)
             </h2>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
               點擊任一欄位表頭即可切換升降冪排序（所有計數為單季 162 場平均產量）
             </p>
           </div>
         </div>
 
         {/* Scope Selector */}
-        <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800">
-          <Filter className="w-3.5 h-3.5 text-slate-400 ml-1.5" />
+        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800">
+          <Filter className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 ml-1.5" />
           <button
             type="button"
             onClick={() => {
@@ -152,8 +152,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
             }}
             className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
               scope === 'user'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             僅主角隊 1～9 棒
@@ -169,8 +169,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
             }}
             className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
               scope === 'top50'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             全聯盟 Top 50
@@ -186,8 +186,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
             }}
             className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
               scope === 'all270'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             全聯盟 270 人
@@ -199,7 +199,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse font-mono text-xs">
           <thead>
-            <tr className="border-b border-slate-800 text-[11px] text-slate-400 select-none">
+            <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 select-none">
               <th className="py-2 px-2 w-10 text-center">排名</th>
               <th className="py-2 px-2 min-w-[140px]">打者 (球隊)</th>
               <th className="py-2 px-2 text-center">能力 (C/P/S/E)</th>
@@ -210,11 +210,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
                     key={col.key}
                     title={col.title}
                     onClick={() => handleSortClick(col.key)}
-                    className={`py-2 px-2 text-right cursor-pointer hover:text-white transition ${
+                    className={`py-2 px-2 text-right cursor-pointer hover:text-slate-900 dark:hover:text-white transition ${
                       isActive
-                        ? 'text-blue-400 font-bold bg-slate-800/60'
+                        ? 'text-blue-600 dark:text-blue-400 font-bold bg-slate-100 dark:bg-slate-800/60'
                         : col.highlight
-                        ? 'text-slate-200'
+                        ? 'text-slate-700 dark:text-slate-200'
                         : ''
                     }`}
                   >
@@ -232,32 +232,32 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/50">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
             {rows.map((b, idx) => (
               <tr
                 key={b.playerId}
                 className={`${
                   b.isUserTeam
-                    ? 'bg-blue-950/30 hover:bg-blue-950/50 text-slate-100'
-                    : 'text-slate-300 hover:bg-slate-800/30'
+                    ? 'bg-blue-50/70 hover:bg-blue-100/70 dark:bg-blue-950/30 dark:hover:bg-blue-950/50 text-slate-900 dark:text-slate-100'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/30'
                 }`}
               >
-                <td className="py-2 px-2 text-center text-slate-500">{idx + 1}</td>
+                <td className="py-2 px-2 text-center text-slate-400 dark:text-slate-500">{idx + 1}</td>
                 <td className="py-2 px-2 font-sans">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-white">{b.playerName}</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">{b.playerName}</span>
                     <span
                       className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
                         b.isUserTeam
-                          ? 'bg-blue-600/30 text-blue-300 border border-blue-500/40'
-                          : 'bg-slate-800 text-slate-400'
+                          ? 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-600/30 dark:text-blue-300 dark:border-blue-500/40'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                       }`}
                     >
                       {b.teamAbbrev}
                     </span>
                   </div>
                 </td>
-                <td className="py-2 px-2 text-center text-[11px] text-slate-400">
+                <td className="py-2 px-2 text-center text-[11px] text-slate-500 dark:text-slate-400">
                   {b.attributes.contact}/{b.attributes.power}/{b.attributes.speed}/
                   {b.attributes.eye}
                 </td>
@@ -268,26 +268,26 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
                   if (col.key === 'opsPlus' || col.key === 'wrcPlus') {
                     colorClass =
                       b[col.key] >= 120
-                        ? 'text-amber-400 font-bold'
+                        ? 'text-amber-600 dark:text-amber-400 font-bold'
                         : b[col.key] <= 85
-                        ? 'text-rose-400'
-                        : 'text-slate-200';
+                        ? 'text-rose-600 dark:text-rose-400'
+                        : 'text-slate-700 dark:text-slate-200';
                   } else if (col.key === 'wpa' || col.key === 're24') {
                     colorClass =
                       b[col.key] > 0.5
-                        ? 'text-emerald-400 font-semibold'
+                        ? 'text-emerald-600 dark:text-emerald-400 font-semibold'
                         : b[col.key] < -0.5
-                        ? 'text-rose-400'
-                        : 'text-slate-300';
+                        ? 'text-rose-600 dark:text-rose-400'
+                        : 'text-slate-600 dark:text-slate-300';
                   } else if (col.highlight) {
-                    colorClass = 'text-blue-300 font-semibold';
+                    colorClass = 'text-blue-600 dark:text-blue-300 font-semibold';
                   }
 
                   return (
                     <td
                       key={col.key}
                       className={`py-2 px-2 text-right ${colorClass} ${
-                        isActive ? 'bg-slate-800/35' : ''
+                        isActive ? 'bg-slate-100/60 dark:bg-slate-800/35' : ''
                       }`}
                     >
                       {valStr}

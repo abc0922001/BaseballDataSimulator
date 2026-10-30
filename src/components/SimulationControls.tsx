@@ -56,14 +56,14 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
       : 0;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs dark:shadow-lg transition-colors">
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         {/* Left: Season count & Seed config */}
         <div className="flex flex-wrap items-center gap-4">
           {/* Seasons selector */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-300">模擬規模：</span>
-            <div className="flex rounded-lg bg-slate-950 p-1 border border-slate-800">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">模擬規模：</span>
+            <div className="flex rounded-lg bg-slate-100 dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-800">
               {SEASON_OPTIONS.map((opt) => (
                 <button
                   key={opt}
@@ -72,27 +72,27 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
                   onClick={() => onChangeSeasons(opt)}
                   className={`px-2.5 py-1 rounded-md text-xs font-mono font-semibold transition cursor-pointer ${
                     seasons === opt
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   {opt} 季
                 </button>
               ))}
             </div>
-            <span className="text-[11px] text-slate-400 hidden sm:inline">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">
               ({(seasons * 2430).toLocaleString()} 場)
             </span>
           </div>
 
           {/* Seed configuration */}
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
             <button
               type="button"
               disabled={isRunning}
               onClick={() => onToggleRandomSeed(!useRandomSeed)}
               className={`text-xs flex items-center gap-1 font-medium cursor-pointer ${
-                useRandomSeed ? 'text-amber-400' : 'text-emerald-400'
+                useRandomSeed ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
               }`}
               title="切換固定種子（可重現對照）或每次隨機種子"
             >
@@ -113,7 +113,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
               disabled={isRunning || useRandomSeed}
               value={seed}
               onChange={(e) => onChangeSeed(Number(e.target.value) || 0)}
-              className="w-20 bg-slate-900 border border-slate-800 rounded px-2 py-0.5 text-xs font-mono text-slate-200 disabled:opacity-50"
+              className="w-20 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded px-2 py-0.5 text-xs font-mono text-slate-900 dark:text-slate-200 disabled:opacity-50"
             />
           </div>
 
@@ -122,7 +122,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
             type="button"
             disabled={isRunning || !canRunSimulation}
             onClick={onRunSimulation}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-40 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-blue-950/60 cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-40 text-white font-bold text-xs flex items-center gap-2 shadow-sm dark:shadow-md dark:shadow-blue-950/60 cursor-pointer"
           >
             {isRunning ? (
               <>
@@ -138,8 +138,8 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
           </button>
 
           {lastElapsedMs !== null && !isRunning && (
-            <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
-              <Timer className="w-3.5 h-3.5 text-slate-500" />
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1">
+              <Timer className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               耗時 {(lastElapsedMs / 1000).toFixed(2)}s
             </span>
           )}
@@ -153,12 +153,12 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
             value={snapshotName}
             onChange={(e) => setSnapshotName(e.target.value)}
             disabled={!hasResult || isRunning}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-60 focus:outline-none focus:border-blue-500 disabled:opacity-50"
+            className="bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-slate-200 w-60 focus:outline-none focus:border-blue-500 disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={!hasResult || isRunning}
-            className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-xs"
           >
             <BookmarkPlus className="w-4 h-4" />
             儲存為實驗快照 (Snapshot)
@@ -169,14 +169,14 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
       {/* Live Progress Bar when running */}
       {isRunning && (
         <div className="mt-3">
-          <div className="flex justify-between text-[11px] font-mono text-slate-400 mb-1">
+          <div className="flex justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400 mb-1">
             <span>
               正在平行模擬第 {progress.completed} / {progress.total} 季 (
               {(progress.completed * 2430).toLocaleString()} 場已完成)
             </span>
             <span>{pct}%</span>
           </div>
-          <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+          <div className="w-full h-2 bg-slate-100 dark:bg-slate-950 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800">
             <div
               className="h-full bg-blue-500 transition-all duration-150"
               style={{ width: `${pct}%` }}
