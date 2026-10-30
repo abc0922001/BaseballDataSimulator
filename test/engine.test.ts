@@ -7,6 +7,7 @@ import {
   calculatePlayerCost,
   createBaselineLineup,
   createLeagueTeams,
+  createModernBaseballLineup,
   validateLineupBudget,
 } from '../src/engine/constants.ts';
 import {
@@ -16,7 +17,10 @@ import {
 } from '../src/engine/gameSimulator.ts';
 import { runMonteCarloSimulation } from '../src/engine/monteCarloRunner.ts';
 import { createPRNG } from '../src/engine/prng.ts';
-import { computePAProbabilities } from '../src/engine/probability.ts';
+import {
+  computePAProbabilities,
+  estimateTheoreticalSlashLine,
+} from '../src/engine/probability.ts';
 import { generateMLBSchedule } from '../src/engine/scheduleGenerator.ts';
 import {
   type HeadToHeadMap,
@@ -425,6 +429,54 @@ describe('1.4 1,800-Point Budget & Progressive Cost Suite (TC-COST-01 ~ 03)', ()
     expect(locked.isValid).toBe(false);
     expect(locked.violatingSlots).toEqual([1]);
     expect(locked.playerCosts[0]).toBeGreaterThan(SINGLE_PLAYER_BUDGET_LIMIT);
+  });
+
+  it('TC-COST-04: [1800點]現代棒球打線 strictly costs 1,800 points and satisfies 1~9 sabermetric role hierarchy', () => {
+    const modern = createModernBaseballLineup();
+    const validation = validateLineupBudget(modern, false);
+    expect(validation.totalCost).toBe(TEAM_BUDGET_LIMIT);
+    expect(validation.remainingPoints).toBe(0);
+    expect(validation.isValid).toBe(true);
+
+    const slashes = modern.map((b) => estimateTheoreticalSlashLine(b.attributes));
+
+    // #1 高率上壘: Top Eye (80), elite OBP (> .390) + HR power threat (> 30 HR/650PA)
+    expect(modern[0].attributes.eye).toBe(80);
+    expect(slashes[0].obp).toBeGreaterThan(0.390);
+    expect(slashes[0].expectedHRPer650PA).toBeGreaterThan(30);
+
+    // #2 全能王牌: Best overall hitter on team (highest OPS, OBP, SLG, WAR)
+    for (let i = 0; i < 9; i++) {
+      if (i !== 1) {
+        expect(slashes[1].ops).toBeGreaterThan(slashes[i].ops);
+        expect(slashes[1].obp).toBeGreaterThan(slashes[i].obp);
+        expect(slashes[1].slg).toBeGreaterThan(slashes[i].slg);
+      }
+    }
+
+    // #4 得點兌現: Top-3 hitter with elite SLG (> .540) and ISO (> .250)
+    expect(slashes[3].slg).toBeGreaterThan(0.540);
+    expect(slashes[3].iso).toBeGreaterThan(0.250);
+    expect(slashes[3].obp).toBeGreaterThan(0.380);
+
+    // #5 殘壘推進 vs #3 殘局一轟: #5 has higher overall OBP/OPS, while #3 specializes in pure HR/ISO
+    expect(slashes[4].ops).toBeGreaterThan(slashes[2].ops);
+    expect(slashes[4].obp).toBeGreaterThan(slashes[2].obp);
+    expect(slashes[2].iso).toBeGreaterThan(slashes[4].iso);
+
+    // #6 次級開路: Highest speed on team + above-average OBP
+    expect(modern[5].attributes.speed).toBe(70);
+    expect(slashes[5].obp).toBeGreaterThan(0.330);
+
+    // #6 -> #7 -> #8 linear offensive decrease, #8 weakest bat
+    expect(slashes[5].ops).toBeGreaterThan(slashes[6].ops);
+    expect(slashes[6].ops).toBeGreaterThan(slashes[7].ops);
+
+    // #9 第二先鋒: Higher OBP and Speed than #7 and #8 for lineup turnover to #1 & #2
+    expect(slashes[8].obp).toBeGreaterThan(slashes[6].obp);
+    expect(slashes[8].obp).toBeGreaterThan(slashes[7].obp);
+    expect(modern[8].attributes.speed).toBeGreaterThan(modern[6].attributes.speed);
+    expect(modern[8].attributes.speed).toBeGreaterThan(modern[7].attributes.speed);
   });
 });
 

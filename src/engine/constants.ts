@@ -133,6 +133,38 @@ export function createBaselineLineup(teamId = 'AL-E-1', isUserTeam = true): Batt
   });
 }
 
+/**
+ * [1800點]現代棒球打線 (Modern Baseball Sabermetric Lineup, Total = 1,800 pts):
+ * 1棒 高率上壘: 頂尖選球與上壘率 + 現代開路長打威脅 (235 pts)
+ * 2棒 全能王牌: 全隊最強綜合火力 (最高 wOBA / OBP / SLG) (275 pts)
+ * 3棒 殘局一轟: 全隊第 5 打者，特化純全壘打火力 (高 ISO) 破解首局兩出局無人在壘 (195 pts)
+ * 4棒 得點兌現: 全隊前三大打者，頂級長打率與上壘能力兌現得點圈期望值 (245 pts)
+ * 5棒 殘壘推進: 全隊第 4 打者 (wOBA 優於第 3 棒)，高接觸與上壘持續延伸攻勢 (220 pts)
+ * 6棒 次級開路: 中下段第二發動機，具備選球上壘與全隊最高速度發動盜壘 (195 pts)
+ * 7棒 能力遞減: 下段過渡單安打型巧打者，進攻產出線性遞減銜接攻勢 (145 pts)
+ * 8棒 守備優先: 進攻產出最低之守備位置，配置基本接觸與速度避免雙殺打 (120 pts)
+ * 9棒 第二先鋒: DH 制第二開路先鋒，選球上壘與速度串聯打線翻轉回 1、2 棒 (170 pts)
+ */
+export function createModernBaseballLineup(teamId = 'AL-E-1'): BatterConfig[] {
+  const base = createBaselineLineup(teamId, true);
+  const configs: readonly { name: string; attrs: PlayerAttributes }[] = [
+    { name: '1棒 高率上壘', attrs: { contact: 55, power: 65, speed: 35, eye: 80 } }, // 235
+    { name: '2棒 全能王牌', attrs: { contact: 75, power: 80, speed: 45, eye: 75 } }, // 275
+    { name: '3棒 殘局一轟', attrs: { contact: 45, power: 75, speed: 30, eye: 45 } }, // 195
+    { name: '4棒 得點兌現', attrs: { contact: 65, power: 80, speed: 35, eye: 65 } }, // 245
+    { name: '5棒 殘壘推進', attrs: { contact: 65, power: 60, speed: 40, eye: 55 } }, // 220
+    { name: '6棒 次級開路', attrs: { contact: 50, power: 20, speed: 70, eye: 55 } }, // 195
+    { name: '7棒 能力遞減', attrs: { contact: 55, power: 20, speed: 45, eye: 25 } }, // 145
+    { name: '8棒 守備優先', attrs: { contact: 45, power: 10, speed: 50, eye: 15 } }, // 120
+    { name: '9棒 第二先鋒', attrs: { contact: 45, power: 10, speed: 60, eye: 55 } }, // 170
+  ];
+  return base.map((b, i) => ({
+    ...b,
+    name: configs[i].name,
+    attributes: { ...configs[i].attrs },
+  }));
+}
+
 export interface TeamSeedMeta {
   id: string;
   name: string;

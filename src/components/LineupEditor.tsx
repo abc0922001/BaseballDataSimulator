@@ -18,6 +18,7 @@ import {
   calculateAttributeCost,
   calculatePlayerCost,
   createBaselineLineup,
+  createModernBaseballLineup,
   validateLineupBudget,
 } from '../engine/constants.ts';
 import { estimateTheoreticalSlashLine } from '../engine/probability.ts';
@@ -155,6 +156,12 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
         attributes: { ...configs[i].attrs },
       }));
       onChangeLineup(next);
+      return;
+    }
+    if (presetId === 'budgetModernBaseball') {
+      onChangeMode('budget');
+      onChangeLock200(false);
+      onChangeLineup(createModernBaseballLineup());
     }
   };
 
@@ -245,6 +252,13 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
               className="px-2.5 py-1.5 rounded bg-sky-50 dark:bg-sky-950/70 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-xs text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800/60 cursor-pointer shadow-2xs"
             >
               一棒選球 100 + 速度 100
+            </button>
+            <button
+              type="button"
+              onClick={() => applyPreset('budgetModernBaseball')}
+              className="px-2.5 py-1.5 rounded bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 text-xs text-indigo-800 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800/60 cursor-pointer shadow-2xs font-medium"
+            >
+              [1800點]現代棒球打線
             </button>
             <button
               type="button"
