@@ -69,5 +69,32 @@ BaseballDataSimulator/
 │   ├── engine/                  # 純 TypeScript 棒球數學模擬核心
 │   ├── worker/                  # Web Worker 多季背景運算層
 │   └── components/              # React 實驗室設定與排行榜介面
+├── test/
+│   └── engine.test.ts           # Vitest 自動化單元與統計收斂測試套件
 └── README.md
+```
+
+---
+
+## 🚀 快速開始與常用指令 (Getting Started)
+
+### 1. 安裝相依套件
+```bash
+npm install --ignore-scripts
+```
+
+### 2. 啟動開發伺服器 (Development Server)
+```bash
+npm run dev
+```
+
+### 3. 執行自動化測試與 30 季統計收斂驗證 (Vitest)
+```bash
+npm test -- --run
+```
+
+### 4. 型別檢查與生產環境建置 (Typecheck & Build)
+```bash
+npx tsc --noEmit
+npm run build
 ```
