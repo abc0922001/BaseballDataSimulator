@@ -151,9 +151,9 @@ BaseballDataSimulator/
    - 執行全部測試：`npm test -- --run`。
    - 切勿執行可能啟用 e2e 的全量無參數 vitest 指令。
 3. **Git 操作約束（極度重要）**：
-   - **僅在使用者明確要求時才執行 commit**。
-   - 執行 commit 時，遵循 `git-commit` 規範，**Commit Message 必須使用正體中文（zh-TW）撰寫**，主旨行使用原形動詞（如 `Add`, `Fix`, `Refactor`, `Update` 等），長度 $\le 50$ 字元且結尾無句號。
-   - **嚴格禁止主動執行 `git push`**。推送權限與時機 100% 由使用者手動控制。
+   - **修改自動 Commit 機制**：每次使用者交代任何程式碼、文件或設定修改，完成後**一律主動使用 `git-commit` 技能執行 commit**，不需等待使用者再次提醒。
+   - **Commit Message 語言與格式**：**必須使用正體中文（zh-TW）撰寫**，嚴格遵循 `git-commit` 規範：主旨行使用首字大寫原形動詞（如 `Add`, `Fix`, `Refactor`, `Update`, `Docs` 等），長度 $\le 50$ 字元且結尾無句點；主旨與內文間留一空行；內文單行折行 $\le 72$ 字元且客觀說明 Why 與 How；嚴禁任何 Emoji。
+   - **嚴格禁止執行 `git push`**：任何情況下一律不得主動執行 `git push`。遠端推送權限與時機 100% 由使用者手動控制。
 4. **保持引擎純粹度**：
    - `src/engine/` 中的所有模組嚴禁引入 React、DOM API、`window` 或任何前端狀態。
    - 所有資料流必須透過純函式、參數傳遞與 PRNG 實例注入，以確保在 Web Worker 與 Node/Vitest 環境中皆可零依賴執行。
