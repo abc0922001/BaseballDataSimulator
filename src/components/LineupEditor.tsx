@@ -490,8 +490,11 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                       </span>
                     </div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                      期望 ~{slash.expectedHRPer650PA.toFixed(0)} HR · BB{' '}
-                      {(slash.bbPct * 100).toFixed(1)}% · K {(slash.kPct * 100).toFixed(1)}%
+                      期望 ~{slash.expectedHRPer650PA.toFixed(0)} HR ·{' '}
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                        WAR ~{slash.expectedWARPer650PA.toFixed(1)}
+                      </span>{' '}
+                      · BB {(slash.bbPct * 100).toFixed(1)}% · K {(slash.kPct * 100).toFixed(1)}%
                     </div>
                   </td>
                 </tr>

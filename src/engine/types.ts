@@ -38,6 +38,7 @@ export interface TheoreticalSlashLine {
   bbPct: number;
   kPct: number;
   expectedHRPer650PA: number;
+  expectedWARPer650PA: number;
 }
 
 export interface BatterCountingStats {
@@ -81,6 +82,7 @@ export interface BatterStats extends BatterCountingStats {
   opsPlus: number;
   woba: number;
   wrcPlus: number;
+  war: number;
 }
 
 export interface ScheduleGame {
@@ -146,6 +148,9 @@ export interface LeagueAverages {
   runsPerGame: number;
   runsPerPA: number;
   hrPerTeamSeason: number;
+  sb?: number;
+  cs?: number;
+  gidp?: number;
 }
 
 export interface SeasonSimulationResult {

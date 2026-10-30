@@ -8,6 +8,17 @@ export const PROGRESSIVE_COST_MULTIPLIER = 2;
 
 export const PYTHAGOREAN_EXPONENT = 1.83;
 
+export const RUNS_PER_WIN = 10.0;
+export const REPLACEMENT_RUNS_PER_600_PA = 20.0;
+
+export const WAR_WEIGHTS = {
+  runsPerWin: 10.0,
+  replacementRunsPer600PA: 20.0,
+  sbRunValue: 0.20,
+  csRunValue: -0.40,
+  gidpRunValue: 0.45,
+} as const;
+
 export const WOBA_WEIGHTS = {
   bb: 0.69,
   single: 0.88,

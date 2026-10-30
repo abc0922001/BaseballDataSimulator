@@ -102,6 +102,14 @@ BaseballDataSimulator/
   3. 整季得失分差（Run Differential, $R - RA$）
   4. 整季總得分（Total Runs Scored, $R$）
 
+### 4.5 勝場貢獻值（WAR, Wins Above Replacement）
+- **公式**：$\text{WAR} = (\text{wRAA} + \text{wSB} + \text{wGIDP} + \text{RepRuns}) / \text{RPW}$
+  - $\text{RPW} = 10.0$（Runs Per Win）。
+  - $\text{RepRuns} = (20.0 / 600) \times \text{PA}$（替補水準得分，全勤 688 PA 約 22.9 分）。
+  - $\text{wSB} = (0.20 \times \text{SB} - 0.40 \times \text{CS}) - \text{lgStealRate} \times (\text{1B} + \text{BB})$。
+  - $\text{wGIDP} = (\text{lgGIDPRate} \times \text{AB} - \text{GIDP}) \times 0.45$。
+- **基準收斂**：全 50 打者長期平均 $\text{WAR} \in [2.1, 2.5]$（中心點 $\approx 2.29$）；第一棒長打 100 時 $\text{WAR} \ge 6.5$（實測約 $8.0$）。
+
 ---
 
 ## 5. 自動化測試驗證清單 (Test Suites & Pass Criteria)
@@ -114,12 +122,12 @@ BaseballDataSimulator/
    - 全聯盟 $\text{SLG} \in [0.396, 0.404]$。
    - 全聯盟 $\text{OPS} \in [0.715, 0.725]$。
    - 全聯盟 $\text{R/G} \in [4.30, 4.70]$，單隊單季平均全壘打落在 $165 \sim 190$ 支。
-   - `OPS+` 與 `wRC+` 中心點為 $100 \pm 1$，平均 `RE24` 接近 0。
+   - `OPS+` 與 `wRC+` 中心點為 $100 \pm 1$，平均 `RE24` 接近 0，全聯盟平均 `WAR` 落在 $[2.1, 2.5]$（約 2.29）。
 2. **單調性與極值組 (`TC-EXT-01 ~ 04`)**：
-   - 選球 Eye `0 vs 50 vs 100`（保送率 $<2.5\%$ vs $>22\%$）。
-   - 打擊 Contact `0 vs 50 vs 100`（打擊率 $<.140$ vs $[.385, .415]$）。
-   - 長打 Power `0 vs 50 vs 100`（全壘打 $<5$ 支 vs $70\sim85$ 支）。
-   - 速度 Speed `0 vs 50 vs 100`（盜壘數 0 vs $>40$ 且成功率 $>85\%$，避免雙殺）。
+   - 選球 Eye `0 vs 50 vs 100`（保送率 $<2.5\%$ vs $>22\%$，WAR 單調遞增）。
+   - 打擊 Contact `0 vs 50 vs 100`（打擊率 $<.140$ vs $[.385, .415]$，WAR 單調遞增）。
+   - 長打 Power `0 vs 50 vs 100`（全壘打 $<5$ 支 vs $70\sim85$ 支，WAR 單調遞增）。
+   - 速度 Speed `0 vs 50 vs 100`（盜壘數 0 vs $>40$ 且成功率 $>85\%$，避免雙殺，WAR 單調遞增）。
 3. **規則防護組 (`TC-RULE-01 ~ 06`)**：
    - 162 場賽程完整性與主客 81 場嚴格對稱（全季勝場 2,430、敗場 2,430）。
    - 延長賽無幽靈跑者（第 10 局起壘包狀態 000）。
@@ -130,7 +138,7 @@ BaseballDataSimulator/
 4. **預算成本組 (`TC-COST-01 ~ 03`)**：
    - 全 50 剛好 1,800 點；遞增成本每級 2 點計算無誤；鎖定單人 200 點阻擋機制生效。
 5. **經典實驗驗證 (`QA-EXP-01`)**：
-   - 第一棒長打 100 連續 30 季顯著提升勝場（$\Delta W \ge +3$ 場）、單季約 80+ 轟、OPS+/wRC+ 達 150+。
+   - 第一棒長打 100 連續 30 季顯著提升勝場（$\Delta W \ge +3$ 場）、單季約 80+ 轟、OPS+/wRC+ 達 150+、WAR 躍升至 8.0+。
 
 ---
 

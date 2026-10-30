@@ -86,6 +86,9 @@ export function runMonteCarloSimulation(options: MonteCarloOptions): MonteCarloR
   let totalLgTB = 0;
   let totalLgBB = 0;
   let totalLgK = 0;
+  let totalLgSB = 0;
+  let totalLgCS = 0;
+  let totalLgGIDP = 0;
 
   for (let s = 0; s < nSeasons; s++) {
     const seasonRes = simulateSeason(s + 1, teams, rng, schedule);
@@ -137,6 +140,9 @@ export function runMonteCarloSimulation(options: MonteCarloOptions): MonteCarloR
     totalLgTB += lg.tb;
     totalLgBB += lg.bb;
     totalLgK += lg.k;
+    totalLgSB += lg.sb ?? 0;
+    totalLgCS += lg.cs ?? 0;
+    totalLgGIDP += lg.gidp ?? 0;
 
     if (onProgress) {
       onProgress(s + 1, nSeasons);
@@ -179,6 +185,9 @@ export function runMonteCarloSimulation(options: MonteCarloOptions): MonteCarloR
     runsPerGame: totalTeamGamesAcrossSeasons > 0 ? totalLgR / totalTeamGamesAcrossSeasons : 4.5,
     runsPerPA: totalLgPA > 0 ? totalLgR / totalLgPA : 0.118,
     hrPerTeamSeason: totalLgHR / (nSeasons * teams.length),
+    sb: totalLgSB / nSeasons,
+    cs: totalLgCS / nSeasons,
+    gidp: totalLgGIDP / nSeasons,
   };
 
   // Build TeamMonteCarloSummary list

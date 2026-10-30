@@ -60,7 +60,7 @@ describe('1.1 Baseline 50 Calibration Suite (TC-BASE-01 ~ 06)', () => {
     expect(lg.hrPerTeamSeason).toBeLessThanOrEqual(190);
   });
 
-  it('TC-BASE-06: Standardized OPS+ and wRC+ center at 100 (±1) and mean RE24 near 0', () => {
+  it('TC-BASE-06: Standardized OPS+ and wRC+ center at 100 (±1), mean RE24 near 0, and mean WAR in [2.1, 2.5]', () => {
     const batters = baseline30.allBatters;
     const meanOpsPlus =
       batters.reduce((sum, b) => sum + b.opsPlus, 0) / batters.length;
@@ -68,12 +68,16 @@ describe('1.1 Baseline 50 Calibration Suite (TC-BASE-01 ~ 06)', () => {
       batters.reduce((sum, b) => sum + b.wrcPlus, 0) / batters.length;
     const meanRe24 =
       batters.reduce((sum, b) => sum + b.re24, 0) / batters.length;
+    const meanWar =
+      batters.reduce((sum, b) => sum + b.war, 0) / batters.length;
 
     expect(meanOpsPlus).toBeGreaterThanOrEqual(99);
     expect(meanOpsPlus).toBeLessThanOrEqual(101);
     expect(meanWrcPlus).toBeGreaterThanOrEqual(99);
     expect(meanWrcPlus).toBeLessThanOrEqual(101);
     expect(Math.abs(meanRe24)).toBeLessThan(1.5);
+    expect(meanWar).toBeGreaterThanOrEqual(2.1);
+    expect(meanWar).toBeLessThanOrEqual(2.5);
   });
 });
 
@@ -116,6 +120,8 @@ describe('1.2 Attribute Monotonicity & Extreme Value Suite (TC-EXT-01 ~ 04)', ()
     expect(eye100.obp).toBeGreaterThan(0.420);
     expect(eye0.obp).toBeLessThan(eye50.obp);
     expect(eye50.obp).toBeLessThan(eye100.obp);
+    expect(eye0.war).toBeLessThan(eye50.war);
+    expect(eye50.war).toBeLessThan(eye100.war);
   });
 
   it('TC-EXT-02: Contact 0 vs 50 vs 100 monotonicity and extreme bounds', () => {
@@ -128,6 +134,8 @@ describe('1.2 Attribute Monotonicity & Extreme Value Suite (TC-EXT-01 ~ 04)', ()
     expect(contact100.avg).toBeGreaterThanOrEqual(0.385);
     expect(contact100.avg).toBeLessThanOrEqual(0.415);
     expect(contact100.kPct).toBeLessThan(0.080);
+    expect(contact0.war).toBeLessThan(contact50.war);
+    expect(contact50.war).toBeLessThan(contact100.war);
   });
 
   it('TC-EXT-03: Power 0 vs 50 vs 100 monotonicity and extreme bounds', () => {
@@ -142,6 +150,8 @@ describe('1.2 Attribute Monotonicity & Extreme Value Suite (TC-EXT-01 ~ 04)', ()
     expect(power100.slg).toBeGreaterThan(0.650);
     expect(power0.slg).toBeLessThan(power50.slg);
     expect(power50.slg).toBeLessThan(power100.slg);
+    expect(power0.war).toBeLessThan(power50.war);
+    expect(power50.war).toBeLessThan(power100.war);
   });
 
   it('TC-EXT-04: Speed 0 vs 50 vs 100 stolen bases, GIDP, and triples', () => {
@@ -156,6 +166,8 @@ describe('1.2 Attribute Monotonicity & Extreme Value Suite (TC-EXT-01 ~ 04)', ()
     expect(speed100.gidp).toBeLessThan(3);
     expect(speed0.gidp).toBeGreaterThan(speed100.gidp);
     expect(speed100.triple).toBeGreaterThan(speed50.triple);
+    expect(speed0.war).toBeLessThan(speed50.war);
+    expect(speed50.war).toBeLessThan(speed100.war);
   });
 });
 
@@ -450,15 +462,17 @@ describe('2.1 Classic Experiment Verification: Baseline All-50 vs 1st Batter Pow
       `1st Batter Power 100 Team: Avg W=${expTeam.avgW.toFixed(2)} (ΔW=${(expTeam.avgW - baseTeam.avgW >= 0 ? '+' : '') + (expTeam.avgW - baseTeam.avgW).toFixed(2)}), Win%=${expTeam.avgWinPct.toFixed(4)} (ΔWin%=${(expTeam.avgWinPct - baseTeam.avgWinPct >= 0 ? '+' : '') + ((expTeam.avgWinPct - baseTeam.avgWinPct) * 100).toFixed(2)}%), PythWin%=${expTeam.avgPythWinPct.toFixed(4)}, R/G=${expTeam.avgRunsPerGame.toFixed(2)}, DivTitle%=${expTeam.divisionTitlePct.toFixed(1)}%, Postseason%=${expTeam.postseasonBerthPct.toFixed(1)}%`
     );
     console.log(
-      `1st Batter Baseline: HR=${baseB1.hr.toFixed(1)}, AVG=${baseB1.avg.toFixed(3)}, OBP=${baseB1.obp.toFixed(3)}, SLG=${baseB1.slg.toFixed(3)}, OPS+=${baseB1.opsPlus.toFixed(1)}, wRC+=${baseB1.wrcPlus.toFixed(1)}, WPA=${baseB1.wpa.toFixed(2)}, RE24=${baseB1.re24.toFixed(1)}`
+      `1st Batter Baseline: HR=${baseB1.hr.toFixed(1)}, AVG=${baseB1.avg.toFixed(3)}, OBP=${baseB1.obp.toFixed(3)}, SLG=${baseB1.slg.toFixed(3)}, OPS+=${baseB1.opsPlus.toFixed(1)}, wRC+=${baseB1.wrcPlus.toFixed(1)}, WAR=${baseB1.war.toFixed(1)}, WPA=${baseB1.wpa.toFixed(2)}, RE24=${baseB1.re24.toFixed(1)}`
     );
     console.log(
-      `1st Batter Power 100: HR=${expB1.hr.toFixed(1)}, AVG=${expB1.avg.toFixed(3)}, OBP=${expB1.obp.toFixed(3)}, SLG=${expB1.slg.toFixed(3)}, OPS+=${expB1.opsPlus.toFixed(1)}, wRC+=${expB1.wrcPlus.toFixed(1)}, WPA=${expB1.wpa.toFixed(2)}, RE24=${expB1.re24.toFixed(1)}`
+      `1st Batter Power 100: HR=${expB1.hr.toFixed(1)}, AVG=${expB1.avg.toFixed(3)}, OBP=${expB1.obp.toFixed(3)}, SLG=${expB1.slg.toFixed(3)}, OPS+=${expB1.opsPlus.toFixed(1)}, wRC+=${expB1.wrcPlus.toFixed(1)}, WAR=${expB1.war.toFixed(1)}, WPA=${expB1.wpa.toFixed(2)}, RE24=${expB1.re24.toFixed(1)}`
     );
 
     expect(expB1.hr).toBeGreaterThan(70);
     expect(expB1.opsPlus).toBeGreaterThan(150);
     expect(expB1.wrcPlus).toBeGreaterThan(150);
+    expect(expB1.war).toBeGreaterThan(6.5);
+    expect(expB1.war).toBeGreaterThan(baseB1.war + 4.5);
     expect(expB1.wpa).toBeGreaterThan(baseB1.wpa + 2.0);
     expect(expB1.re24).toBeGreaterThan(baseB1.re24 + 35);
     expect(expTeam.avgW).toBeGreaterThan(baseTeam.avgW + 3.0);

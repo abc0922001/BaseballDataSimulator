@@ -241,6 +241,7 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
                 <th className="py-1.5 px-2 text-right">RBI (A→B)</th>
                 <th className="py-1.5 px-2 text-right">OPS+ (A→B)</th>
                 <th className="py-1.5 px-2 text-right">wRC+ (A→B)</th>
+                <th className="py-1.5 px-2 text-right">WAR (A→B)</th>
                 <th className="py-1.5 px-2 text-right">RE24 (B - A)</th>
                 <th className="py-1.5 px-2 text-right">WPA (B - A)</th>
               </tr>
@@ -248,6 +249,7 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
               {snapA.result.userBatters.map((bA, idx) => {
                 const bB = snapB.result.userBatters[idx];
+                const dWAR = bB.war - bA.war;
                 const dRE24 = bB.re24 - bA.re24;
                 const dWPA = bB.wpa - bA.wpa;
                 const attrChanged =
@@ -297,6 +299,20 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
                     <td className="py-1.5 px-2 text-right">
                       {bA.wrcPlus.toFixed(0)} →{' '}
                       <strong className="text-amber-600 dark:text-amber-300">{bB.wrcPlus.toFixed(0)}</strong>
+                    </td>
+                    <td className="py-1.5 px-2 text-right">
+                      {bA.war.toFixed(1)} →{' '}
+                      <strong
+                        className={
+                          dWAR > 0.3
+                            ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                            : dWAR < -0.3
+                            ? 'text-rose-600 dark:text-rose-400 font-bold'
+                            : 'text-slate-900 dark:text-white'
+                        }
+                      >
+                        {bB.war.toFixed(1)} ({formatDelta(dWAR, 1)})
+                      </strong>
                     </td>
                     <td
                       className={`py-1.5 px-2 text-right font-semibold ${

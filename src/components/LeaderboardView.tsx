@@ -26,6 +26,7 @@ type SortKey =
   | 'opsPlus'
   | 'woba'
   | 'wrcPlus'
+  | 'war'
   | 'wpa'
   | 're24';
 
@@ -56,6 +57,7 @@ const COLUMNS: readonly {
   { key: 'opsPlus', label: 'OPS+', title: '標準化 OPS (聯盟平均 = 100)', highlight: true },
   { key: 'woba', label: 'wOBA', title: '加權上壘率 (Weighted On-Base Average)' },
   { key: 'wrcPlus', label: 'wRC+', title: '加權得分創造值+ (聯盟平均 = 100)', highlight: true },
+  { key: 'war', label: 'WAR', title: '勝場貢獻值 (Wins Above Replacement)', highlight: true },
   { key: 'wpa', label: 'WPA', title: '勝率貢獻值 (Win Probability Added)', highlight: true },
   { key: 're24', label: 'RE24', title: '24 狀態期望得分貢獻值', highlight: true },
 ];
@@ -106,6 +108,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
       case 'sb':
       case 'cs':
       case 'gidp':
+      case 'war':
       case 're24':
         return b[key].toFixed(1);
       case 'opsPlus':
@@ -265,7 +268,16 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
                   const isActive = sortKey === col.key;
                   const valStr = formatStat(b, col.key);
                   let colorClass = '';
-                  if (col.key === 'opsPlus' || col.key === 'wrcPlus') {
+                  if (col.key === 'war') {
+                    colorClass =
+                      b.war >= 5.0
+                        ? 'text-amber-600 dark:text-amber-400 font-bold'
+                        : b.war >= 2.0
+                        ? 'text-emerald-600 dark:text-emerald-400 font-semibold'
+                        : b.war < 0
+                        ? 'text-rose-600 dark:text-rose-400'
+                        : 'text-slate-700 dark:text-slate-200';
+                  } else if (col.key === 'opsPlus' || col.key === 'wrcPlus') {
                     colorClass =
                       b[col.key] >= 120
                         ? 'text-amber-600 dark:text-amber-400 font-bold'

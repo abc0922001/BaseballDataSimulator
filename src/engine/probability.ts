@@ -1,5 +1,6 @@
 import type { PAOutcome, PlayerAttributes, TheoreticalSlashLine } from './types.ts';
 import type { PRNG } from './prng.ts';
+import { WAR_WEIGHTS, WOBA_WEIGHTS } from './constants.ts';
 
 /**
  * Piecewise linear interpolation anchored at x=0, x=50, x=100.
@@ -125,6 +126,31 @@ export function estimateTheoreticalSlashLine(attrs: PlayerAttributes): Theoretic
   const kPct = (1 - probs.pBB) * (1 - avg) * probs.pKGivenABOut;
   const expectedHRPer650PA = 650 * (1 - probs.pBB) * avg * probs.pHRGivenHit;
 
+  const expPA = 650;
+  const pBB = probs.pBB;
+  const p1B = (1 - pBB) * avg * probs.p1BGivenHit;
+  const p2B = (1 - pBB) * avg * probs.p2BGivenHit;
+  const p3B = (1 - pBB) * avg * probs.p3BGivenHit;
+  const pHR = (1 - pBB) * avg * probs.pHRGivenHit;
+  const theoreticalWOBA =
+    WOBA_WEIGHTS.bb * pBB +
+    WOBA_WEIGHTS.single * p1B +
+    WOBA_WEIGHTS.double * p2B +
+    WOBA_WEIGHTS.triple * p3B +
+    WOBA_WEIGHTS.hr * pHR;
+
+  const lgWOBA = 0.315;
+  const wRAA = ((theoreticalWOBA - lgWOBA) / WOBA_WEIGHTS.scale) * expPA;
+
+  const pAtt = getSteal2BAttemptProb(attrs.speed);
+  const pSucc = getSteal2BSuccessProb(attrs.speed);
+  const expSB = 50 * pAtt * pSucc;
+  const expCS = 50 * pAtt * (1 - pSucc);
+  const wSB = WAR_WEIGHTS.sbRunValue * expSB + WAR_WEIGHTS.csRunValue * expCS;
+
+  const repRuns = (WAR_WEIGHTS.replacementRunsPer600PA / 600) * expPA;
+  const expectedWARPer650PA = (wRAA + wSB + repRuns) / WAR_WEIGHTS.runsPerWin;
+
   return {
     avg,
     obp,
@@ -134,6 +160,7 @@ export function estimateTheoreticalSlashLine(attrs: PlayerAttributes): Theoretic
     bbPct,
     kPct,
     expectedHRPer650PA,
+    expectedWARPer650PA,
   };
 }
 

@@ -256,6 +256,21 @@ $$P(\text{BB}) = \text{lerp3}(E,\; 0.015,\; 0.09333,\; 0.250)$$
      - 根據當前局數與上下半局計算兩隊剩餘進攻半局數，結合當前半局剩餘期望得分 $RE(\text{baseState}, \text{outs})$ 與泊松/常態得分分布，即時算出主隊當下期望勝率 $WE \in [0, 1]$。
      - 每次打席結束後，進攻方勝率變化量 $\Delta WE = WE_{\text{after}} - WE_{\text{before}}$ 直接累加至該打者之 `WPA`（支援再見安打直接躍升至 $WE = 1.0$ 的高槓桿加成）。
 
+5. **`WAR`（Wins Above Replacement，勝場貢獻值）**：
+   - 嚴格遵循賽伯計量學（Sabermetrics）標準，將打擊創造得分、跑壘淨效益、雙殺打損益與替補球員基準水準整合為單一勝場指標：
+     $$\text{WAR} = \frac{\text{wRAA} + \text{wSB} + \text{wGIDP} + \text{RepRuns}}{\text{RPW}}$$
+   - 關鍵常數與組成分量定義：
+     - **勝場得分轉換率（$\text{RPW}$）**：固定為 $10.0$ 分/勝（對應場均 4.4~4.5 分之 MLB 聯盟環境）。
+     - **替補水準得分（$\text{RepRuns}$）**：比照 FanGraphs 標準，每 600 打席賦予 $20.0$ 分替補跑壘與打擊基底：
+       $$\text{RepRuns} = \frac{20.0}{600} \times \text{PA}$$
+     - **跑壘超越平均貢獻（$\text{wSB}$）**：
+       $$\text{wSB} = (0.20 \times \text{SB} - 0.40 \times \text{CS}) - \text{lgStealRate} \times (\text{1B} + \text{BB})$$
+     - **雙殺避免超越平均貢獻（$\text{wGIDP}$）**：
+       $$\text{wGIDP} = (\text{lgGIDPRate} \times \text{AB} - \text{GIDP}) \times 0.45$$
+   - 基準收斂驗證：
+     - 全 50 基準打者因打擊與跑壘皆為聯盟平均，$\text{wRAA} \approx 0, \text{wSB} \approx 0, \text{wGIDP} \approx 0$。打滿 162 場全勤（約 688 打席）自然收斂至 **$2.29\text{ WAR}$**（完全落在合格全職打者 $[2.1, 2.5]$ 區間）。
+     - 極端打者（如第一棒長打 100、單季 85 轟）$\text{wRAA} \approx +55$ 分，WAR 躍升至 **$8.0\text{ WAR}$**（淨增 $+5.5\text{ WAR}$）。
+
 ---
 
 ## 7. 系統技術架構與前端介面設計 (System Architecture & UI)
@@ -309,4 +324,4 @@ BaseballDataSimulator/
 3. **分區戰績與晉級率儀表板（Standings & Playoff Odds）**：
    - 展示主角隊於多季模擬後的平均勝敗場、實際勝率、**畢氏期望勝率**、場均得分、**分區封王率（%）** 與 **外卡/季後賽總晉級率（%）**，以及雙聯盟 6 個分區的完整戰績榜。
 4. **打擊排行榜與棒次效益分析（Batter Leaderboard & Lineup Breakdown）**：
-   - 完整呈現基礎數據與進階數據（`OPS+`, `wOBA`, `wRC+`, `WPA`, `RE24`, `ISO`, `BABIP`），支援點擊任一欄位排序，以及「僅顯示主角隊 1～9 棒」或「全聯盟 270 名打者排行」切換。
+   - 完整呈現基礎數據與進階數據（`OPS+`, `wOBA`, `wRC+`, `WAR`, `WPA`, `RE24`, `ISO`, `BABIP`），支援點擊任一欄位排序，以及「僅顯示主角隊 1～9 棒」或「全聯盟 270 名打者排行」切換。

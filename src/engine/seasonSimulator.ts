@@ -10,7 +10,14 @@ import type {
   TeamSeasonSummary,
 } from './types.ts';
 import type { PRNG } from './prng.ts';
-import { PYTHAGOREAN_EXPONENT, WOBA_WEIGHTS, createLeagueTeams } from './constants.ts';
+import {
+  PYTHAGOREAN_EXPONENT,
+  REPLACEMENT_RUNS_PER_600_PA,
+  RUNS_PER_WIN,
+  WAR_WEIGHTS,
+  WOBA_WEIGHTS,
+  createLeagueTeams,
+} from './constants.ts';
 import { createEmptyCountingStats, simulateGame } from './gameSimulator.ts';
 import { generateMLBSchedule } from './scheduleGenerator.ts';
 
@@ -146,7 +153,7 @@ export function computeBatterDerivedStats(
   attributes: TeamConfig['lineup'][number]['attributes'],
   lg: LeagueAverages
 ): BatterStats {
-  const { pa, ab, h, single, double, triple, hr, tb, bb, k, sb, cs } = counting;
+  const { pa, ab, h, single, double, triple, hr, tb, bb, k, sb, cs, gidp } = counting;
 
   const avg = ab > 0 ? h / ab : 0;
   const obp = pa > 0 ? (h + bb) / pa : 0;
@@ -180,6 +187,20 @@ export function computeBatterDerivedStats(
       ? 100 * (1 + wRAA / pa / lg.runsPerPA)
       : 100;
 
+  const lgOpps = lg.single + lg.bb;
+  const lgStealRuns =
+    WAR_WEIGHTS.sbRunValue * (lg.sb ?? 0) + WAR_WEIGHTS.csRunValue * (lg.cs ?? 0);
+  const lgStealRate = lgOpps > 0 ? lgStealRuns / lgOpps : 0;
+  const opp = single + bb;
+  const rawStealRuns = WAR_WEIGHTS.sbRunValue * sb + WAR_WEIGHTS.csRunValue * cs;
+  const wSB = rawStealRuns - opp * lgStealRate;
+
+  const lgGIDPRate =
+    lg.ab > 0 && lg.gidp !== undefined ? lg.gidp / lg.ab : 0.012;
+  const wGIDP = (lgGIDPRate * ab - gidp) * WAR_WEIGHTS.gidpRunValue;
+  const repRuns = pa > 0 ? (REPLACEMENT_RUNS_PER_600_PA / 600) * pa : 0;
+  const war = (wRAA + wSB + wGIDP + repRuns) / RUNS_PER_WIN;
+
   return {
     ...counting,
     playerId,
@@ -201,6 +222,7 @@ export function computeBatterDerivedStats(
     opsPlus,
     woba,
     wrcPlus,
+    war,
   };
 }
 
@@ -339,6 +361,9 @@ export function simulateSeason(
   let lgTB = 0;
   let lgBB = 0;
   let lgK = 0;
+  let lgSB = 0;
+  let lgCS = 0;
+  let lgGIDP = 0;
 
   for (const t of activeTeams) {
     const bList = teamBatterStatsMap.get(t.id)!;
@@ -355,6 +380,9 @@ export function simulateSeason(
       lgTB += b.tb;
       lgBB += b.bb;
       lgK += b.k;
+      lgSB += b.sb;
+      lgCS += b.cs;
+      lgGIDP += b.gidp;
     }
   }
 
@@ -392,6 +420,9 @@ export function simulateSeason(
     runsPerGame: totalTeamGames > 0 ? lgR / totalTeamGames : 4.5,
     runsPerPA: lgPA > 0 ? lgR / lgPA : 0.118,
     hrPerTeamSeason: lgHR / activeTeams.length,
+    sb: lgSB,
+    cs: lgCS,
+    gidp: lgGIDP,
   };
 
   const batters: BatterStats[] = [];
