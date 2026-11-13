@@ -28,7 +28,7 @@ export const StandingsView: React.FC<StandingsViewProps> = ({ result }) => {
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs dark:shadow-lg transition-colors">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+            <Trophy className="w-5 h-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
               主角隊蒙地卡羅期望表現摘要 — {u.teamName} ({u.league} {u.division})
             </h2>
@@ -70,7 +70,7 @@ export const StandingsView: React.FC<StandingsViewProps> = ({ result }) => {
           {/* Card 3: Pythagorean Win% */}
           <div className="bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
             <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <TrendingUp className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
+              <TrendingUp className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" aria-hidden="true" />
               畢氏期望勝率 (Pyth Win%)
             </div>
             <div className="text-xl font-mono font-bold text-blue-600 dark:text-blue-400 mt-1">
@@ -103,7 +103,7 @@ export const StandingsView: React.FC<StandingsViewProps> = ({ result }) => {
           {/* Card 5: Division Title % */}
           <div className="bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
             <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <Award className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
+              <Award className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
               分區封王率 (Division %)
             </div>
             <div className="text-xl font-mono font-bold text-amber-600 dark:text-amber-400 mt-1">
@@ -117,7 +117,7 @@ export const StandingsView: React.FC<StandingsViewProps> = ({ result }) => {
           {/* Card 6: Postseason Berth % */}
           <div className="bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
             <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <Shield className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+              <Shield className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
               總晉級率 (分區 + 外卡)
             </div>
             <div className="text-xl font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-1">
@@ -132,7 +132,7 @@ export const StandingsView: React.FC<StandingsViewProps> = ({ result }) => {
         {/* League Environment Calibration Strip */}
         <div className="mt-3 pt-2.5 border-t border-slate-200 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-slate-500 dark:text-slate-400">
           <span className="flex items-center gap-1.5">
-            <BarChart3 className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+            <BarChart3 className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" aria-hidden="true" />
             全聯盟環境統計 (30 隊平均)：
           </span>
           <span>
@@ -168,20 +168,25 @@ export const StandingsView: React.FC<StandingsViewProps> = ({ result }) => {
                   <div className="text-xs font-semibold text-blue-600 dark:text-blue-400">
                     {lgId} {divId}
                   </div>
-                  <div className="overflow-x-auto">
+                  <div
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`${lgId} ${divId} 分區戰績表`}
+                    className="overflow-x-auto"
+                  >
                     <table className="w-full text-left border-collapse text-xs font-mono">
                       <thead>
                         <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400 uppercase">
-                          <th className="py-1 px-1.5">球隊</th>
-                          <th className="py-1 px-1.5 text-right">勝</th>
-                          <th className="py-1 px-1.5 text-right">敗</th>
-                          <th className="py-1 px-1.5 text-right">勝率</th>
-                          <th className="py-1 px-1.5 text-right">畢氏勝率</th>
-                          <th className="py-1 px-1.5 text-right">R/G</th>
-                          <th className="py-1 px-1.5 text-right">得失差</th>
-                          <th className="py-1 px-1.5 text-right">封王%</th>
-                          <th className="py-1 px-1.5 text-right">外卡%</th>
-                          <th className="py-1 px-1.5 text-right">晉級%</th>
+                          <th scope="col" className="py-1 px-1.5">球隊</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">勝</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">敗</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">勝率</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">畢氏勝率</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">R/G</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">得失差</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">封王%</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">外卡%</th>
+                          <th scope="col" className="py-1 px-1.5 text-right">晉級%</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -194,7 +199,7 @@ export const StandingsView: React.FC<StandingsViewProps> = ({ result }) => {
                                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/30'
                             }`}
                           >
-                            <td className="py-1.5 px-1.5 font-sans flex items-center gap-1.5">
+                            <th scope="row" className="py-1.5 px-1.5 font-sans text-left font-normal flex items-center gap-1.5">
                               <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono w-3">
                                 {idx + 1}
                               </span>
@@ -204,7 +209,7 @@ export const StandingsView: React.FC<StandingsViewProps> = ({ result }) => {
                                   USER
                                 </span>
                               )}
-                            </td>
+                            </th>
                             <td className="py-1.5 px-1.5 text-right">{t.avgW.toFixed(1)}</td>
                             <td className="py-1.5 px-1.5 text-right">{t.avgL.toFixed(1)}</td>
                             <td className="py-1.5 px-1.5 text-right">

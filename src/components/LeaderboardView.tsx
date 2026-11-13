@@ -66,15 +66,39 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
   const [scope, setScope] = useState<ScopeMode>('user');
   const [sortKey, setSortKey] = useState<SortKey>('slot');
   const [sortAsc, setSortAsc] = useState<boolean>(true);
+  const [sortAnnouncement, setSortAnnouncement] = useState<string>('');
+
+  const runWithOptionalViewTransition = (nextScope: ScopeMode, update: () => void) => {
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => void };
+    if (nextScope !== 'all270' && typeof doc.startViewTransition === 'function') {
+      doc.startViewTransition(update);
+    } else {
+      update();
+    }
+  };
+
+  const getRowCountForScope = (targetScope: ScopeMode): number => {
+    if (targetScope === 'user') return result.userBatters.length;
+    if (targetScope === 'top50') return Math.min(50, result.allBatters.length);
+    return result.allBatters.length;
+  };
 
   const handleSortClick = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortAsc(!sortAsc);
-    } else {
-      setSortKey(key);
-      // Default ascending only for slot, k, cs, gidp; descending for productive stats
-      setSortAsc(key === 'slot');
-    }
+    const nextAsc = sortKey === key ? !sortAsc : key === 'slot';
+    const colLabel = COLUMNS.find((c) => c.key === key)?.label ?? key;
+    const count = getRowCountForScope(scope);
+
+    runWithOptionalViewTransition(scope, () => {
+      if (sortKey === key) {
+        setSortAsc(!sortAsc);
+      } else {
+        setSortKey(key);
+        setSortAsc(key === 'slot');
+      }
+      setSortAnnouncement(
+        `已依 ${colLabel} ${nextAsc ? '升冪' : '降冪'}排序，共 ${count} 位打者`
+      );
+    });
   };
 
   const rows = useMemo(() => {
@@ -132,7 +156,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
       {/* Header & Filter Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <ListOrdered className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <ListOrdered className="w-5 h-5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
               打者基礎與進階數據排行榜 (Sabermetrics Leaderboard)
@@ -145,13 +169,16 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
 
         {/* Scope Selector */}
         <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800">
-          <Filter className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 ml-1.5" />
+          <Filter className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 ml-1.5" aria-hidden="true" />
           <button
             type="button"
             onClick={() => {
-              setScope('user');
-              setSortKey('slot');
-              setSortAsc(true);
+              runWithOptionalViewTransition('user', () => {
+                setScope('user');
+                setSortKey('slot');
+                setSortAsc(true);
+                setSortAnnouncement('已切換為僅主角隊 1～9 棒，依棒次升冪排序');
+              });
             }}
             className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
               scope === 'user'
@@ -164,11 +191,18 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
           <button
             type="button"
             onClick={() => {
-              setScope('top50');
-              if (sortKey === 'slot') {
-                setSortKey('wrcPlus');
-                setSortAsc(false);
-              }
+              const nextKey = sortKey === 'slot' ? 'wrcPlus' : sortKey;
+              const nextAsc = sortKey === 'slot' ? false : sortAsc;
+              runWithOptionalViewTransition('top50', () => {
+                setScope('top50');
+                if (sortKey === 'slot') {
+                  setSortKey('wrcPlus');
+                  setSortAsc(false);
+                }
+                setSortAnnouncement(
+                  `已切換為全聯盟 Top 50，依 ${COLUMNS.find((c) => c.key === nextKey)?.label ?? nextKey} ${nextAsc ? '升冪' : '降冪'}排序`
+                );
+              });
             }}
             className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
               scope === 'top50'
@@ -181,11 +215,16 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
           <button
             type="button"
             onClick={() => {
+              const nextKey = sortKey === 'slot' ? 'wrcPlus' : sortKey;
+              const nextAsc = sortKey === 'slot' ? false : sortAsc;
               setScope('all270');
               if (sortKey === 'slot') {
                 setSortKey('wrcPlus');
                 setSortAsc(false);
               }
+              setSortAnnouncement(
+                `已切換為全聯盟 270 人，依 ${COLUMNS.find((c) => c.key === nextKey)?.label ?? nextKey} ${nextAsc ? '升冪' : '降冪'}排序`
+              );
             }}
             className={`px-2.5 py-1 rounded text-xs font-semibold transition cursor-pointer ${
               scope === 'all270'
@@ -198,22 +237,43 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
         </div>
       </div>
 
+      <p role="status" className="visually-hidden">
+        {sortAnnouncement}
+      </p>
+
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div
+        tabIndex={0}
+        role="region"
+        aria-labelledby="leaderboard-table-caption"
+        className="overflow-x-auto"
+      >
         <table className="w-full text-left border-collapse font-mono text-xs">
+          <caption id="leaderboard-table-caption" className="visually-hidden">
+            打者基礎與進階數據排行榜
+          </caption>
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 select-none">
-              <th className="py-2 px-2 w-10 text-center">排名</th>
-              <th className="py-2 px-2 min-w-[140px]">打者 (球隊)</th>
-              <th className="py-2 px-2 text-center">能力 (C/P/S/E)</th>
+              <th scope="col" className="py-2 px-2 w-10 text-center">
+                排名
+              </th>
+              <th
+                scope="col"
+                className="py-2 px-2 min-w-[140px] sticky left-0 z-10 bg-white dark:bg-slate-900"
+              >
+                打者 (球隊)
+              </th>
+              <th scope="col" className="py-2 px-2 text-center">
+                能力 (C/P/S/E)
+              </th>
               {COLUMNS.map((col) => {
                 const isActive = sortKey === col.key;
                 return (
                   <th
                     key={col.key}
-                    title={col.title}
-                    onClick={() => handleSortClick(col.key)}
-                    className={`py-2 px-2 text-right cursor-pointer hover:text-slate-900 dark:hover:text-white transition ${
+                    scope="col"
+                    aria-sort={isActive ? (sortAsc ? 'ascending' : 'descending') : undefined}
+                    className={`p-0 text-right transition ${
                       isActive
                         ? 'text-blue-600 dark:text-blue-400 font-bold bg-slate-100 dark:bg-slate-800/60'
                         : col.highlight
@@ -221,15 +281,20 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
                         : ''
                     }`}
                   >
-                    <div className="inline-flex items-center justify-end gap-0.5">
+                    <button
+                      type="button"
+                      title={col.title}
+                      onClick={() => handleSortClick(col.key)}
+                      className="w-full min-h-6 py-2 px-2 inline-flex items-center justify-end gap-0.5 cursor-pointer hover:text-slate-900 dark:hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-500"
+                    >
                       <span>{col.label}</span>
                       {isActive &&
                         (sortAsc ? (
-                          <ArrowUp className="w-3 h-3" />
+                          <ArrowUp className="w-3 h-3" aria-hidden="true" />
                         ) : (
-                          <ArrowDown className="w-3 h-3" />
+                          <ArrowDown className="w-3 h-3" aria-hidden="true" />
                         ))}
-                    </div>
+                    </button>
                   </th>
                 );
               })}
@@ -239,14 +304,21 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
             {rows.map((b, idx) => (
               <tr
                 key={b.playerId}
-                className={`${
+                className={`${scope !== 'all270' ? 'vt-row ' : ''}${
                   b.isUserTeam
-                    ? 'bg-blue-50/70 hover:bg-blue-100/70 dark:bg-blue-950/30 dark:hover:bg-blue-950/50 text-slate-900 dark:text-slate-100'
-                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/30'
+                    ? 'bg-blue-50 hover:bg-blue-100 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-900 dark:text-slate-100'
+                    : 'bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300'
                 }`}
               >
                 <td className="py-2 px-2 text-center text-slate-400 dark:text-slate-500">{idx + 1}</td>
-                <td className="py-2 px-2 font-sans">
+                <th
+                  scope="row"
+                  className={`py-2 px-2 font-sans text-left font-normal sticky left-0 z-10 ${
+                    b.isUserTeam
+                      ? 'bg-blue-50 dark:bg-slate-900'
+                      : 'bg-white dark:bg-slate-900'
+                  }`}
+                >
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold text-slate-900 dark:text-white">{b.playerName}</span>
                     <span
@@ -259,7 +331,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result }) => {
                       {b.teamAbbrev}
                     </span>
                   </div>
-                </td>
+                </th>
                 <td className="py-2 px-2 text-center text-[11px] text-slate-500 dark:text-slate-400">
                   {b.attributes.contact}/{b.attributes.power}/{b.attributes.speed}/
                   {b.attributes.eye}

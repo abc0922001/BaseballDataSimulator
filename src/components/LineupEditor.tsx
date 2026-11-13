@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AlertTriangle,
   ArrowDown,
@@ -53,6 +53,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
   onChangeMode,
   onChangeLock200,
 }) => {
+  const [swapStatus, setSwapStatus] = useState<string>('');
   const budgetInfo = validateLineupBudget(lineup, lockSinglePlayer200);
 
   const handleAttrChange = (
@@ -90,7 +91,18 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
       ...b,
       slot: idx + 1,
     }));
-    onChangeLineup(reindexed);
+    const applyUpdate = () => {
+      onChangeLineup(reindexed);
+      setSwapStatus(
+        `已將 ${temp.name} 從第 ${indexA + 1} 棒調整至第 ${indexB + 1} 棒`
+      );
+    };
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => void };
+    if (typeof doc.startViewTransition === 'function') {
+      doc.startViewTransition(applyUpdate);
+    } else {
+      applyUpdate();
+    }
   };
 
   const applyPreset = (presetId: string) => {
@@ -171,7 +183,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Sliders className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+            <Sliders className="w-5 h-5 text-blue-500 dark:text-blue-400" aria-hidden="true" />
             主角隊 1～9 棒打線配置實驗室 (Lineup & Point Pool)
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -190,7 +202,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-4 h-4" aria-hidden="true" />
             模式一：自由變因實驗 (Free Sandbox)
           </button>
 
@@ -203,7 +215,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            <Flame className="w-4 h-4" />
+            <Flame className="w-4 h-4" aria-hidden="true" />
             模式二：1,800 點固定預算挑戰 (Budget Challenge)
           </button>
         </div>
@@ -220,7 +232,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
               onClick={() => applyPreset('baseline50')}
               className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 cursor-pointer"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
               重置全 50 基準
             </button>
           </div>
@@ -305,11 +317,11 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
               >
                 {lockSinglePlayer200 ? (
                   <>
-                    <Lock className="w-3 h-3" /> 鎖定單人 200 點上限
+                    <Lock className="w-3 h-3" aria-hidden="true" /> 鎖定單人 200 點上限
                   </>
                 ) : (
                   <>
-                    <Unlock className="w-3 h-3" /> 允許跨球員自由挪移
+                    <Unlock className="w-3 h-3" aria-hidden="true" /> 允許跨球員自由挪移
                   </>
                 )}
               </button>
@@ -327,12 +339,12 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
             {mode === 'budget' ? (
               budgetInfo.isValid ? (
                 <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                   剩餘 {budgetInfo.remainingPoints} 點 (符合規範)
                 </span>
               ) : (
                 <span className="text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1 font-semibold">
-                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
                   {budgetInfo.overBudgetPoints > 0
                     ? `總預算超支 ${budgetInfo.overBudgetPoints} 點`
                     : `第 ${budgetInfo.violatingSlots.join(', ')} 棒超過單人 200 點上限`}
@@ -345,38 +357,60 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
             )}
           </div>
 
-          {/* Progress Bar */}
-          <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
-            <div
-              className={`h-full transition-all duration-200 ${
-                mode === 'budget' && !budgetInfo.isValid
-                  ? 'bg-rose-500'
-                  : budgetInfo.totalCost === TEAM_BUDGET_LIMIT
-                  ? 'bg-emerald-500'
-                  : 'bg-blue-500'
-              }`}
-              style={{
-                width: `${Math.min(100, (budgetInfo.totalCost / TEAM_BUDGET_LIMIT) * 100)}%`,
-              }}
-            />
-          </div>
+          {/* Native Progress Bar */}
+          <progress
+            className="bds-progress w-full h-2 mt-2 block"
+            value={Math.min(TEAM_BUDGET_LIMIT, budgetInfo.totalCost)}
+            max={TEAM_BUDGET_LIMIT}
+            aria-label="團隊總預算消耗進度"
+            style={
+              {
+                '--progress-bar-fill':
+                  mode === 'budget' && !budgetInfo.isValid
+                    ? 'rgb(244 63 94)'
+                    : budgetInfo.totalCost === TEAM_BUDGET_LIMIT
+                    ? 'rgb(16 185 129)'
+                    : 'rgb(59 130 246)',
+              } as React.CSSProperties
+            }
+          />
         </div>
       </div>
 
+      <p role="status" className="visually-hidden">
+        {swapStatus}
+      </p>
+
       {/* 1~9 Lineup Table */}
-      <div className="overflow-x-auto">
+      <div
+        tabIndex={0}
+        role="region"
+        aria-labelledby="lineup-table-caption"
+        className="overflow-x-auto"
+      >
         <table className="w-full text-left border-collapse">
+          <caption id="lineup-table-caption" className="visually-hidden">
+            主角隊 1 至 9 棒打線能力配置表
+          </caption>
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              <th className="py-2 px-2 w-16">棒次</th>
-              <th className="py-2 px-2 w-40">打者名稱</th>
+              <th scope="col" className="py-2 px-2 w-24">
+                棒次
+              </th>
+              <th scope="col" className="py-2 px-2 w-40">
+                打者名稱
+              </th>
               {ATTRIBUTE_KEYS.map((attr) => (
-                <th key={attr.key} className="py-2 px-2 min-w-[155px]">
+                <th key={attr.key} scope="col" className="py-2 px-2 min-w-[155px]">
                   {attr.label}
                 </th>
               ))}
-              <th className="py-2 px-2 text-right w-24">單人點數</th>
-              <th className="py-2 px-2 text-right w-52">理論期望三圍 (AVG/OBP/SLG/OPS)</th>
+              <th scope="col" className="py-2 px-2 text-right w-24">
+                單人點數
+              </th>
+              <th scope="col" className="py-2 px-2 text-right w-52">
+                理論期望三圍 (AVG/OBP/SLG/OPS)
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 text-xs">
@@ -391,44 +425,50 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
               return (
                 <tr
                   key={batter.id}
-                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/40 transition ${
+                  className={`vt-row hover:bg-slate-50 dark:hover:bg-slate-800/40 transition ${
                     isSlotViolating ? 'bg-rose-50 dark:bg-rose-950/25' : ''
                   }`}
                 >
                   {/* Slot & Move Up/Down */}
-                  <td className="py-2.5 px-2 font-mono font-bold text-slate-800 dark:text-slate-200">
+                  <th
+                    scope="row"
+                    className="py-2.5 px-2 font-mono font-bold text-slate-800 dark:text-slate-200 text-left"
+                  >
                     <div className="flex items-center gap-1">
                       <span className="w-5 h-5 rounded bg-slate-100 dark:bg-slate-800 inline-flex items-center justify-center text-xs text-blue-600 dark:text-blue-400 font-bold">
                         {batter.slot}
                       </span>
-                      <div className="flex flex-col">
+                      <div className="flex items-center gap-0.5">
                         <button
                           type="button"
                           disabled={idx === 0}
                           onClick={() => handleSwapSlots(idx, idx - 1)}
-                          title="上移棒次"
-                          className="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 disabled:opacity-25 cursor-pointer"
+                          title={`將第 ${batter.slot} 棒上移`}
+                          aria-label={`將第 ${batter.slot} 棒上移`}
+                          className="min-w-6 min-h-6 inline-flex items-center justify-center rounded text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-25 cursor-pointer"
                         >
-                          <ArrowUp className="w-3 h-3" />
+                          <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
                         </button>
                         <button
                           type="button"
                           disabled={idx === lineup.length - 1}
                           onClick={() => handleSwapSlots(idx, idx + 1)}
-                          title="下移棒次"
-                          className="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 disabled:opacity-25 cursor-pointer"
+                          title={`將第 ${batter.slot} 棒下移`}
+                          aria-label={`將第 ${batter.slot} 棒下移`}
+                          className="min-w-6 min-h-6 inline-flex items-center justify-center rounded text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-800 disabled:opacity-25 cursor-pointer"
                         >
-                          <ArrowDown className="w-3 h-3" />
+                          <ArrowDown className="w-3.5 h-3.5" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
-                  </td>
+                  </th>
 
                   {/* Batter Name */}
                   <td className="py-2.5 px-2">
                     <input
                       type="text"
                       value={batter.name}
+                      aria-label={`第 ${batter.slot} 棒打者名稱`}
                       onChange={(e) => handleNameChange(idx, e.target.value)}
                       className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded px-2 py-1 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500"
                     />
@@ -447,6 +487,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                             min={0}
                             max={100}
                             value={val}
+                            aria-label={`第 ${batter.slot} 棒 ${attr.label} 滑桿`}
                             onChange={(e) =>
                               handleAttrChange(idx, attr.key, Number(e.target.value))
                             }
@@ -457,6 +498,7 @@ export const LineupEditor: React.FC<LineupEditorProps> = ({
                             min={0}
                             max={100}
                             value={val}
+                            aria-label={`第 ${batter.slot} 棒 ${attr.label} 數值`}
                             onChange={(e) =>
                               handleAttrChange(idx, attr.key, Number(e.target.value))
                             }

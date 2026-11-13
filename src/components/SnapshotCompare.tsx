@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import { GitCompare, Trash2, Upload } from 'lucide-react';
 import type { ExperimentSnapshot } from '../engine/types.ts';
 
@@ -15,11 +15,13 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
 }) => {
   const [selectedAId, setSelectedAId] = useState<string>('');
   const [selectedBId, setSelectedBId] = useState<string>('');
+  const selectAId = useId();
+  const selectBId = useId();
 
   if (snapshots.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 text-center shadow-xs dark:shadow-lg transition-colors">
-        <GitCompare className="w-8 h-8 text-slate-400 dark:text-slate-600 mx-auto mb-2" />
+        <GitCompare className="w-8 h-8 text-slate-400 dark:text-slate-600 mx-auto mb-2" aria-hidden="true" />
         <h3 className="text-sm font-bold text-slate-800 dark:text-slate-300">
           尚無已儲存的實驗快照 (No Saved Snapshots)
         </h3>
@@ -48,7 +50,7 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs dark:shadow-lg space-y-5 transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <GitCompare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <GitCompare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
               A/B 實驗快照並排對照實驗室 (Snapshot Comparison & Lineup Diff)
@@ -64,20 +66,25 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
       </div>
 
       {/* All Snapshots Summary Table */}
-      <div className="overflow-x-auto">
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label="已儲存實驗快照總覽表"
+        className="overflow-x-auto"
+      >
         <table className="w-full text-left border-collapse text-xs font-mono">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
-              <th className="py-2 px-2">快照名稱</th>
-              <th className="py-2 px-2">模式 / 點數</th>
-              <th className="py-2 px-2 text-right">季數 (Seed)</th>
-              <th className="py-2 px-2 text-right">平均勝場 (Avg W)</th>
-              <th className="py-2 px-2 text-right">實際勝率 (Win%)</th>
-              <th className="py-2 px-2 text-right">畢氏勝率 (Pyth%)</th>
-              <th className="py-2 px-2 text-right">場均得分 (R/G)</th>
-              <th className="py-2 px-2 text-right">封王率%</th>
-              <th className="py-2 px-2 text-right">總晉級率%</th>
-              <th className="py-2 px-2 text-right">操作</th>
+              <th scope="col" className="py-2 px-2">快照名稱</th>
+              <th scope="col" className="py-2 px-2">模式 / 點數</th>
+              <th scope="col" className="py-2 px-2 text-right">季數 (Seed)</th>
+              <th scope="col" className="py-2 px-2 text-right">平均勝場 (Avg W)</th>
+              <th scope="col" className="py-2 px-2 text-right">實際勝率 (Win%)</th>
+              <th scope="col" className="py-2 px-2 text-right">畢氏勝率 (Pyth%)</th>
+              <th scope="col" className="py-2 px-2 text-right">場均得分 (R/G)</th>
+              <th scope="col" className="py-2 px-2 text-right">封王率%</th>
+              <th scope="col" className="py-2 px-2 text-right">總晉級率%</th>
+              <th scope="col" className="py-2 px-2 text-right">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -85,9 +92,9 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
               const u = s.result.userTeamSummary;
               return (
                 <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                  <td className="py-2 px-2 font-sans font-semibold text-slate-900 dark:text-white">
+                  <th scope="row" className="py-2 px-2 font-sans text-left font-semibold text-slate-900 dark:text-white">
                     {s.name}
-                  </td>
+                  </th>
                   <td className="py-2 px-2 font-sans text-slate-600 dark:text-slate-300">
                     {s.mode === 'budget' ? '1800點預算' : '自由變因'} ({s.totalBudgetUsed}點)
                   </td>
@@ -117,19 +124,21 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
                       <button
                         type="button"
                         onClick={() => onRestoreSnapshot(s)}
-                        title="載入此快照打線設定"
+                        title={`載入快照：${s.name}`}
+                        aria-label={`套用快照：${s.name}`}
                         className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-sans text-[11px] inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <Upload className="w-3 h-3" />
+                        <Upload className="w-3 h-3" aria-hidden="true" />
                         套用
                       </button>
                       <button
                         type="button"
                         onClick={() => onDeleteSnapshot(s.id)}
-                        title="刪除此快照"
-                        className="p-1 rounded bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/60 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 cursor-pointer"
+                        title={`刪除快照：${s.name}`}
+                        aria-label={`刪除快照：${s.name}`}
+                        className="p-1.5 rounded bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/60 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 cursor-pointer"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                     </div>
                   </td>
@@ -145,15 +154,18 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-600 dark:text-slate-400">基準組 A (Baseline)：</span>
+              <label htmlFor={selectAId} className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                基準組 A (Baseline)：
+              </label>
               <select
+                id={selectAId}
                 value={snapA.id}
                 onChange={(e) => setSelectedAId(e.target.value)}
                 className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1 text-xs text-slate-900 dark:text-white"
               >
                 {snapshots.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} ({uA ? `${s.result.userTeamSummary.avgW.toFixed(1)}W` : ''})
+                    {s.name} ({s.result.userTeamSummary.avgW.toFixed(1)}W)
                   </option>
                 ))}
               </select>
@@ -162,8 +174,11 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500">VS.</span>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-blue-600 dark:text-blue-400">實驗組 B (Experiment)：</span>
+              <label htmlFor={selectBId} className="text-xs font-bold text-blue-600 dark:text-blue-400">
+                實驗組 B (Experiment)：
+              </label>
               <select
+                id={selectBId}
                 value={snapB.id}
                 onChange={(e) => setSelectedBId(e.target.value)}
                 className="bg-white dark:bg-slate-900 border border-blue-400 dark:border-blue-600/60 rounded px-2.5 py-1 text-xs text-slate-900 dark:text-white"
@@ -229,21 +244,26 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
         </div>
 
         {/* 1~9 Slot-by-Slot Comparison Table */}
-        <div className="overflow-x-auto">
+        <div
+          tabIndex={0}
+          role="region"
+          aria-label="1 至 9 棒快照數據對比表"
+          className="overflow-x-auto"
+        >
           <table className="w-full text-left border-collapse text-xs font-mono">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400 uppercase">
-                <th className="py-1.5 px-2">棒次</th>
-                <th className="py-1.5 px-2">A 組打者 (C/P/S/E)</th>
-                <th className="py-1.5 px-2">B 組打者 (C/P/S/E)</th>
-                <th className="py-1.5 px-2 text-right">PA (A→B)</th>
-                <th className="py-1.5 px-2 text-right">HR (A→B)</th>
-                <th className="py-1.5 px-2 text-right">RBI (A→B)</th>
-                <th className="py-1.5 px-2 text-right">OPS+ (A→B)</th>
-                <th className="py-1.5 px-2 text-right">wRC+ (A→B)</th>
-                <th className="py-1.5 px-2 text-right">WAR (A→B)</th>
-                <th className="py-1.5 px-2 text-right">RE24 (B - A)</th>
-                <th className="py-1.5 px-2 text-right">WPA (B - A)</th>
+                <th scope="col" className="py-1.5 px-2">棒次</th>
+                <th scope="col" className="py-1.5 px-2">A 組打者 (C/P/S/E)</th>
+                <th scope="col" className="py-1.5 px-2">B 組打者 (C/P/S/E)</th>
+                <th scope="col" className="py-1.5 px-2 text-right">PA (A→B)</th>
+                <th scope="col" className="py-1.5 px-2 text-right">HR (A→B)</th>
+                <th scope="col" className="py-1.5 px-2 text-right">RBI (A→B)</th>
+                <th scope="col" className="py-1.5 px-2 text-right">OPS+ (A→B)</th>
+                <th scope="col" className="py-1.5 px-2 text-right">wRC+ (A→B)</th>
+                <th scope="col" className="py-1.5 px-2 text-right">WAR (A→B)</th>
+                <th scope="col" className="py-1.5 px-2 text-right">RE24 (B - A)</th>
+                <th scope="col" className="py-1.5 px-2 text-right">WPA (B - A)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -263,7 +283,9 @@ export const SnapshotCompare: React.FC<SnapshotCompareProps> = ({
                     key={bA.slot}
                     className={attrChanged ? 'bg-blue-50/80 dark:bg-blue-950/30' : 'hover:bg-slate-50 dark:hover:bg-slate-900/60'}
                   >
-                    <td className="py-1.5 px-2 font-bold text-blue-600 dark:text-blue-400">#{bA.slot}</td>
+                    <th scope="row" className="py-1.5 px-2 text-left font-bold text-blue-600 dark:text-blue-400">
+                      #{bA.slot}
+                    </th>
                     <td className="py-1.5 px-2 font-sans text-slate-700 dark:text-slate-300">
                       {bA.playerName}{' '}
                       <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">

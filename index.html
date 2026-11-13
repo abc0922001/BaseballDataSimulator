@@ -1,8 +1,22 @@
 <!doctype html>
-<html lang="zh-TW" class="dark">
+<html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      try {
+        const saved = localStorage.getItem('bds_theme');
+        const meta = document.querySelector('meta[name="color-scheme"]');
+        if (meta) {
+          meta.setAttribute('content', saved === 'light' || saved === 'dark' ? saved : 'light dark');
+        }
+        const isDark =
+          saved === 'dark' ||
+          (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', isDark);
+      } catch {}
+    </script>
     <title>Baseball Data Simulator — 純數學棒球數據模擬實驗室</title>
   </head>
   <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-blue-500 selection:text-white transition-colors duration-150">

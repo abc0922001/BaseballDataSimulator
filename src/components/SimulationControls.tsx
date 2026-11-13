@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   BookmarkPlus,
   Dices,
@@ -42,6 +42,17 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
   onSaveSnapshot,
 }) => {
   const [snapshotName, setSnapshotName] = useState('');
+  const [completionStatus, setCompletionStatus] = useState('');
+  const wasRunningRef = useRef(false);
+
+  useEffect(() => {
+    if (wasRunningRef.current && !isRunning && hasResult) {
+      setCompletionStatus(`已完成 ${seasons} 季蒙地卡羅模擬`);
+    } else if (isRunning) {
+      setCompletionStatus('');
+    }
+    wasRunningRef.current = isRunning;
+  }, [isRunning, hasResult, seasons]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,12 +109,12 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
             >
               {useRandomSeed ? (
                 <>
-                  <Dices className="w-3.5 h-3.5" />
+                  <Dices className="w-3.5 h-3.5" aria-hidden="true" />
                   隨機 Seed
                 </>
               ) : (
                 <>
-                  <Hash className="w-3.5 h-3.5" />
+                  <Hash className="w-3.5 h-3.5" aria-hidden="true" />
                   固定 Seed
                 </>
               )}
@@ -112,6 +123,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
               type="number"
               disabled={isRunning || useRandomSeed}
               value={seed}
+              aria-label="隨機種子數值 (Seed)"
               onChange={(e) => onChangeSeed(Number(e.target.value) || 0)}
               className="w-20 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded px-2 py-0.5 text-xs font-mono text-slate-900 dark:text-slate-200 disabled:opacity-50"
             />
@@ -126,12 +138,12 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
           >
             {isRunning ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                 Web Worker 運算中 ({progress.completed}/{progress.total} 季)...
               </>
             ) : (
               <>
-                <Play className="w-4 h-4 fill-current" />
+                <Play className="w-4 h-4 fill-current" aria-hidden="true" />
                 啟動 {seasons} 季蒙地卡羅模擬
               </>
             )}
@@ -139,7 +151,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
 
           {lastElapsedMs !== null && !isRunning && (
             <span className="text-xs text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1">
-              <Timer className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+              <Timer className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" aria-hidden="true" />
               耗時 {(lastElapsedMs / 1000).toFixed(2)}s
             </span>
           )}
@@ -150,6 +162,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
           <input
             type="text"
             placeholder="輸入實驗快照名稱 (例如: 一棒長打 100)"
+            aria-label="實驗快照名稱"
             value={snapshotName}
             onChange={(e) => setSnapshotName(e.target.value)}
             disabled={!hasResult || isRunning}
@@ -160,11 +173,15 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
             disabled={!hasResult || isRunning}
             className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-xs"
           >
-            <BookmarkPlus className="w-4 h-4" />
+            <BookmarkPlus className="w-4 h-4" aria-hidden="true" />
             儲存為實驗快照 (Snapshot)
           </button>
         </form>
       </div>
+
+      <p role="status" className="visually-hidden">
+        {completionStatus}
+      </p>
 
       {/* Live Progress Bar when running */}
       {isRunning && (
@@ -176,12 +193,12 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
             </span>
             <span>{pct}%</span>
           </div>
-          <div className="w-full h-2 bg-slate-100 dark:bg-slate-950 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800">
-            <div
-              className="h-full bg-blue-500 transition-all duration-150"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
+          <progress
+            className="bds-progress w-full h-2 block"
+            value={progress.completed}
+            max={progress.total}
+            aria-label="蒙地卡羅模擬進度"
+          />
         </div>
       )}
     </div>

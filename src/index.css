@@ -1,3 +1,66 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light dark;
+
+  &:has(> head > meta[name="color-scheme"][content="dark"]) {
+    color-scheme: dark;
+  }
+  &:has(> head > meta[name="color-scheme"][content="light"]) {
+    color-scheme: light;
+  }
+}
+
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+progress.bds-progress {
+  appearance: none;
+  border: 0 solid;
+  overflow: clip;
+  border-radius: 9999px;
+  background: var(--progress-bar-track, rgb(226 232 240));
+}
+
+.dark progress.bds-progress {
+  background: var(--progress-bar-track, rgb(30 41 59));
+}
+
+progress.bds-progress::-webkit-progress-bar {
+  background: transparent;
+}
+
+progress.bds-progress::-webkit-progress-value {
+  background: var(--progress-bar-fill, rgb(59 130 246));
+  border-radius: 9999px;
+  transition: inline-size 0.2s ease;
+}
+
+progress.bds-progress::-moz-progress-bar {
+  background: var(--progress-bar-fill, rgb(59 130 246));
+  border-radius: 9999px;
+  transition: inline-size 0.2s ease;
+}
+
+tr.vt-row {
+  view-transition-name: match-element;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
